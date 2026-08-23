@@ -3,48 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pateliya Reels App</title>
+  <title>Pateliya Reels</title>
   <style>
-    body { margin: 0; background-color: #000; color: #fff; font-family: sans-serif; text-align: center; }
-    header { padding: 15px; background: #111; font-size: 20px; font-weight: bold; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 10; }
-    .upload-section { padding: 15px; background: #222; margin: 15px auto; max-width: 400px; border-radius: 8px; }
-    input[type="file"], input[type="text"] { margin: 8px 0; width: 90%; padding: 8px; border-radius: 4px; border: none; }
-    button { background: #e50914; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
-    .reels-container { max-width: 400px; margin: 20px auto; }
-    .reel-card { background: #111; margin-bottom: 20px; border-radius: 8px; overflow: hidden; border: 1px solid #333; }
-    video { width: 100%; max-height: 500px; display: block; }
-    .caption { padding: 10px; font-size: 14px; text-align: left; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #000; color: #fff; font-family: sans-serif; overflow-x: hidden; }
+    
+    /* Header */
+    header { position: fixed; top: 0; width: 100%; z-index: 100; background: rgba(0,0,0,0.6); padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+    .logo { font-size: 18px; font-weight: bold; }
+    .upload-btn { background: #e50914; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+
+    /* Modal / Upload Form */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; align-items: center; justify-content: center; }
+    .modal-content { background: #111; padding: 20px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; }
+    .modal-content input { width: 100%; margin: 10px 0; padding: 8px; border-radius: 4px; border: none; }
+
+    /* Reels Feed */
+    .reels-container { width: 100vw; height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+    .reel-card { width: 100vw; height: 100vh; scroll-snap-align: start; position: relative; background: #000; display: flex; justify-content: center; align-items: center; }
+    video { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Instagram Action Buttons Overlay */
+    .reel-actions { position: absolute; right: 15px; bottom: 80px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
+    .action-btn { background: none; border: none; color: white; display: flex; flex-direction: column; align-items: center; font-size: 24px; cursor: pointer; text-shadow: 0 2px 5px rgba(0,0,0,0.7); }
+    .action-btn span { font-size: 12px; margin-top: 4px; }
+
+    /* Video Overlay Details */
+    .reel-details { position: absolute; left: 15px; bottom: 30px; z-index: 10; text-align: left; max-width: 70%; text-shadow: 0 2px 5px rgba(0,0,0,0.7); }
+    .caption { font-size: 14px; margin-top: 5px; }
   </style>
 </head>
 <body>
 
-  <header>🎬 Pateliya Reels App</header>
+  <header>
+    <div class="logo">🎬 Pateliya Reels</div>
+    <button class="upload-btn" onclick="openModal()">+ Upload</button>
+  </header>
 
-  <div class="upload-section">
-    <h3>नई रील अपलोड करें</h3>
-    <form id="uploadForm">
-      <input type="file" id="videoFile" accept="video/*" required><br>
-      <input type="text" id="caption" placeholder="कैप्शन लिखें..." required><br>
-      <button type="submit">अपलोड करें</button>
-    </form>
+  <!-- Upload Modal -->
+  <div class="modal" id="uploadModal">
+    <div class="modal-content">
+      <h3>रील अपलोड करें</h3>
+      <form id="uploadForm">
+        <input type="file" id="videoFile" accept="video/*" required>
+        <input type="text" id="caption" placeholder="कैप्शन लिखें (उदा. Timli Song)..." required>
+        <button type="submit" class="upload-btn" style="width:100%; margin-top:100px; padding:10px;">पब्लिश करें</button>
+        <button type="button" onclick="closeModal()" style="background:none; color:#aaa; border:none; margin-top:10px; cursor:pointer;">रद्द करें</button>
+      </form>
+    </div>
   </div>
 
   <div class="reels-container" id="reelsContainer"></div>
 
   <script>
+    function openModal() { document.getElementById('uploadModal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('uploadModal').style.display = 'none'; }
+
     async function loadReels() {
       try {
         const res = await fetch('/api/reels');
         const reels = await res.json();
         const container = document.getElementById('reelsContainer');
-        container.innerHTML = reels.map(r => `
+
+        if(reels.length === 0) {
+          container.innerHTML = `<div style="padding-top:200px; text-align:center;">कोई रील नहीं मिली। ऊपर + Upload बटन दबाकर अपलोड करें!</div>`;
+          return;
+        }
+
+        container.innerHTML = reels.map((r, i) => `
           <div class="reel-card">
-            <video src="${r.videoUrl}" controls></video>
-            <div class="caption">${r.caption}</div>
+            <video src="${r.videoUrl}" loop onclick="togglePlay(this)"></video>
+            
+            <div class="reel-actions">
+              <button class="action-btn" onclick="toggleLike(this)">
+                ❤️ <span class="like-count">0</span>
+              </button>
+              <button class="action-btn" onclick="alert('कमेंट्स जल्द आ रहे हैं!')">
+                💬 <span>0</span>
+              </button>
+              <button class="action-btn" onclick="shareReel('${r.videoUrl}')">
+                🚀 <span>शेयर</span>
+              </button>
+              <a href="${r.videoUrl}" download class="action-btn" style="text-decoration:none;">
+                ⬇️ <span>डाउनलोड</span>
+              </a>
+              <button class="action-btn" onclick="alert('रील सेव हो गई!')">
+                🔖 <span>सेव</span>
+              </button>
+            </div>
+
+            <div class="reel-details">
+              <strong>@PateliyaUser</strong>
+              <div class="caption">${r.caption}</div>
+            </div>
           </div>
         `).join('');
+
+        // ऑटोप्ले पहला वीडियो
+        const firstVideo = document.querySelector('video');
+        if(firstVideo) firstVideo.play();
+
       } catch (err) {
         console.log('Error loading reels');
+      }
+    }
+
+    function togglePlay(video) {
+      if (video.paused) video.play();
+      else video.pause();
+    }
+
+    function toggleLike(btn) {
+      const count = btn.querySelector('.like-count');
+      let current = parseInt(count.textContent);
+      count.textContent = current + 1;
+    }
+
+    function shareReel(url) {
+      if (navigator.share) {
+        navigator.share({ title: 'Pateliya Reels', url: window.location.origin + url });
+      } else {
+        navigator.clipboard.writeText(window.location.origin + url);
+        alert('लिंक कॉपी हो गया!');
       }
     }
 
@@ -54,18 +134,16 @@
       formData.append('video', document.getElementById('videoFile').files[0]);
       formData.append('caption', document.getElementById('caption').value);
 
-      const btn = e.target.querySelector('button');
-      btn.textContent = 'अपलोड हो रहा है...';
+      closeModal();
+      alert('अपलोड हो रहा है, कृपया 10 सेकंड इंतज़ार करें...');
 
       try {
         await fetch('/api/reels', { method: 'POST', body: formData });
-        alert('रील सफलतापर्वक अपलोड हो गई!');
+        alert('रील पब्लिश हो गई!');
         document.getElementById('uploadForm').reset();
         loadReels();
       } catch (err) {
-        alert('अपलोड करने में विफल!');
-      } finally {
-        btn.textContent = 'अपलोड करें';
+        alert('अपलोड में एरर आया!');
       }
     });
 
@@ -74,4 +152,5 @@
 
 </body>
 </html>
+
 
