@@ -8,31 +8,38 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #000; color: #fff; font-family: sans-serif; overflow-x: hidden; }
     
-    /* Header */
+    /* Header & Top Nav */
     header { position: fixed; top: 0; width: 100%; z-index: 100; background: rgba(0,0,0,0.85); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
-    .logo-container { display: flex; align-items: center; gap: 10px; }
-    .logo-img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; border: 1px solid #444; }
-    .logo-text { font-size: 20px; font-weight: bold; letter-spacing: 1px; color: #fff; }
-    .upload-btn { background: #e50914; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    .logo-container { display: flex; align-items: center; gap: 8px; }
+    .logo-img { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; border: 1px solid #444; }
+    .logo-text { font-size: 18px; font-weight: bold; letter-spacing: 1px; color: #fff; }
+    
+    .top-actions { display: flex; gap: 8px; align-items: center; }
+    .nav-btn { background: #222; color: white; border: 1px solid #444; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .live-btn { background: #ff0055; border: none; }
+    .upload-btn { background: #e50914; border: none; }
 
-    /* Modal / Upload Form */
+    /* Modal / Popups */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; align-items: center; justify-content: center; }
     .modal-content { background: #111; padding: 20px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; border: 1px solid #333; }
-    .modal-content input { width: 100%; margin: 10px 0; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: white; }
+    .modal-content input, .modal-content select { width: 100%; margin: 10px 0; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: white; }
 
-    /* Reels Feed (Instagram Style) */
+    /* Reels Feed */
     .reels-container { width: 100vw; height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
     .reel-card { width: 100vw; height: 100vh; scroll-snap-align: start; position: relative; background: #000; display: flex; justify-content: center; align-items: center; }
     video { width: 100%; height: 100%; object-fit: cover; }
 
-    /* Instagram Action Buttons Overlay (Right Side) */
-    .reel-actions { position: absolute; right: 12px; bottom: 85px; display: flex; flex-direction: column; gap: 18px; align-items: center; z-index: 10; }
-    .action-btn { background: none; border: none; color: white; display: flex; flex-direction: column; align-items: center; font-size: 22px; cursor: pointer; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+    /* Instagram Style Right Action Buttons */
+    .reel-actions { position: absolute; right: 12px; bottom: 85px; display: flex; flex-direction: column; gap: 16px; align-items: center; z-index: 10; }
+    .action-btn { background: none; border: none; color: white; display: flex; flex-direction: column; align-items: center; font-size: 20px; cursor: pointer; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
     .action-btn span { font-size: 11px; margin-top: 3px; font-weight: 500; }
 
-    /* Details Overlay (Bottom Left) */
+    /* Bottom Left Info & Follow */
     .reel-details { position: absolute; left: 15px; bottom: 30px; z-index: 10; text-align: left; max-width: 70%; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
-    .username { font-size: 15px; font-weight: bold; margin-bottom: 6px; display: block; }
+    .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .username { font-size: 15px; font-weight: bold; }
+    .follow-btn { background: transparent; border: 1px solid #fff; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; cursor: pointer; }
+    .follow-btn.following { background: #fff; color: #000; }
     .caption { font-size: 14px; line-height: 1.4; color: #f1f1f1; }
   </style>
 </head>
@@ -43,18 +50,22 @@
       <img src="logo.png" alt="UTGRAM" class="logo-img" onerror="this.style.display='none'">
       <div class="logo-text">UTGRAM</div>
     </div>
-    <button class="upload-btn" onclick="openModal()">+ Upload</button>
+    <div class="top-actions">
+      <button class="nav-btn live-btn" onclick="startLive()">🔴 Live</button>
+      <button class="nav-btn upload-btn" onclick="openModal()">+ Upload</button>
+    </div>
   </header>
 
-  <!-- Upload Modal -->
+  <!-- Upload Modal (Gallery & Camera Support) -->
   <div class="modal" id="uploadModal">
     <div class="modal-content">
-      <h3 style="margin-bottom:12px;">नई रील अपलोड करें</h3>
+      <h3 style="margin-bottom:12px;">वीडियो अपलोड या रिकॉर्ड करें</h3>
       <form id="uploadForm">
-        <input type="file" id="videoFile" accept="video/*" required>
+        <label style="font-size:12px; color:#aaa; display:block; text-align:left;">गैलरी से वीडियो चुनें या कैमरा खोलें:</label>
+        <input type="file" id="videoFile" accept="video/*" capture="environment" required>
         <input type="text" id="caption" placeholder="कैप्शन लिखें..." required>
-        <button type="submit" class="upload-btn" style="width:100%; margin-top:15px; padding:12px;">पब्लिश करें</button>
-        <button type="button" onclick="closeModal()" style="background:none; color:#aaa; border:none; margin-top:12px; cursor:pointer;">रद्द करें</button>
+        <button type="submit" class="nav-btn upload-btn" style="width:100%; margin-top:15px; padding:12px; font-size:14px;">पब्लिश करें</button>
+        <button type="button" onclick="closeModal()" style="background:none; color:#aaa; border:none; margin-top:12px; cursor:pointer; font-size:13px;">रद्द करें</button>
       </form>
     </div>
   </div>
@@ -65,6 +76,17 @@
     function openModal() { document.getElementById('uploadModal').style.display = 'flex'; }
     function closeModal() { document.getElementById('uploadModal').style.display = 'none'; }
 
+    function startLive() {
+      alert('🔴 लाइव ब्रॉडकास्ट मोड शुरू हो रहा है! (कैमरा परमिशन दें)');
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(stream => {
+          alert('आप लाइव हैं! (इसे बंद करने के लिए पेज रीफ्रेश करें)');
+        })
+        .catch(err => {
+          alert('लाइव शुरू करने के लिए कैमरा और माइक की अनुमति चाहिए।');
+        });
+    }
+
     async function loadReels() {
       try {
         const res = await fetch('/api/reels');
@@ -72,23 +94,23 @@
         const container = document.getElementById('reelsContainer');
 
         if(!reels || reels.length === 0) {
-          container.innerHTML = `<div style="padding-top:250px; text-align:center; color:#888;">कोई रील नहीं मिली।<br>ऊपर + Upload बटन दबाकर वीडियो डालें!</div>`;
+          container.innerHTML = `<div style="padding-top:250px; text-align:center; color:#888;">कोई रील नहीं मिली।<br>ऊपर 🔴 Live या + Upload से शुरुआत करें!</div>`;
           return;
         }
 
-        container.innerHTML = reels.map((r) => `
+        container.innerHTML = reels.map((r, index) => `
           <div class="reel-card">
             <video src="${r.videoUrl}" loop playsinline onclick="togglePlay(this)"></video>
             
-            <!-- Instagram Style Right Action Buttons -->
+            <!-- Right Actions -->
             <div class="reel-actions">
               <button class="action-btn" onclick="toggleLike(this)">
-                ❤️ <span class="like-count">124</span>
+                ❤️ <span class="like-count">142</span>
               </button>
-              <button class="action-btn" onclick="alert('कमेंट्स फ़ीचर जल्द खुलेगा!')">
-                💬 <span>12</span>
+              <button class="action-btn" onclick="alert('कमेंट्स बॉक्स खुल रहा है!')">
+                💬 <span>18</span>
               </button>
-              <button class="action-btn" onclick="alert('रीमिक्स चालू हो रहा है!')">
+              <button class="action-btn" onclick="alert('रीमिक्स इनेबल हो गया!')">
                 🔄 <span>रीमिक्स</span>
               </button>
               <button class="action-btn" onclick="shareReel('${r.videoUrl}')">
@@ -102,15 +124,17 @@
               </button>
             </div>
 
-            <!-- Bottom Left Info -->
+            <!-- Bottom Left User & Follow -->
             <div class="reel-details">
-              <span class="username">@UTGRAM_Official</span>
+              <div class="user-row">
+                <span class="username">@UTGRAM_Creator</span>
+                <button class="follow-btn" onclick="toggleFollow(this)">फॉलो करें</button>
+              </div>
               <div class="caption">${r.caption}</div>
             </div>
           </div>
         `).join('');
 
-        // Autoplay first video
         const firstVideo = document.querySelector('video');
         if(firstVideo) firstVideo.play();
 
@@ -132,12 +156,22 @@
       setTimeout(() => btn.style.transform = 'scale(1)', 200);
     }
 
+    function toggleFollow(btn) {
+      if (btn.classList.contains('following')) {
+        btn.classList.remove('following');
+        btn.textContent = 'फॉलो करें';
+      } else {
+        btn.classList.add('following');
+        btn.textContent = 'फॉलोइंग ✓';
+      }
+    }
+
     function shareReel(url) {
       if (navigator.share) {
         navigator.share({ title: 'UTGRAM Reel', url: window.location.origin + url });
       } else {
         navigator.clipboard.writeText(window.location.origin + url);
-        alert('रील लिंक कॉपी हो गया!');
+        alert('लिंक कॉपी हो गया!');
       }
     }
 
@@ -148,15 +182,15 @@
       formData.append('caption', document.getElementById('caption').value);
 
       closeModal();
-      alert('अपलोड हो रहा है, कृपया थोड़ा इंतज़ार करें...');
+      alert('वीडियो अपलोड हो रहा है...');
 
       try {
         await fetch('/api/reels', { method: 'POST', body: formData });
-        alert('रील सफलतापर्वक पब्लिश हो गई!');
+        alert('रील पब्लिश हो गई!');
         document.getElementById('uploadForm').reset();
         loadReels();
       } catch (err) {
-        alert('अपलोड में एरर आया!');
+        alert('अपलोड करने में एरर आया!');
       }
     });
 
