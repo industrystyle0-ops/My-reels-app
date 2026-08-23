@@ -3,18 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pateliya Reels</title>
+  <title>Pateliya Reels App</title>
   <style>
     body { margin: 0; background-color: #000; color: #fff; font-family: sans-serif; text-align: center; }
-    header { padding: 15px; background: #111; font-size: 20px; font-weight: bold; border-bottom: 1px solid #333; }
-    .container { padding: 50px 20px; }
+    header { padding: 15px; background: #111; font-size: 20px; font-weight: bold; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 10; }
+    .upload-section { padding: 15px; background: #222; margin: 15px auto; max-width: 400px; border-radius: 8px; }
+    input[type="file"], input[type="text"] { margin: 8px 0; width: 90%; padding: 8px; border-radius: 4px; border: none; }
+    button { background: #e50914; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+    .reels-container { max-width: 400px; margin: 20px auto; }
+    .reel-card { background: #111; margin-bottom: 20px; border-radius: 8px; overflow: hidden; border: 1px solid #333; }
+    video { width: 100%; max-height: 500px; display: block; }
+    .caption { padding: 10px; font-size: 14px; text-align: left; }
   </style>
 </head>
 <body>
+
   <header>🎬 Pateliya Reels App</header>
-  <div class="container">
-    <h2>आपकी रील्स ऐप लाइव हो चुकी है!</h2>
-    <p>यहाँ आपकी वीडियोज़ दिखेंगी।</p>
+
+  <div class="upload-section">
+    <h3>नई रील अपलोड करें</h3>
+    <form id="uploadForm">
+      <input type="file" id="videoFile" accept="video/*" required><br>
+      <input type="text" id="caption" placeholder="कैप्शन लिखें..." required><br>
+      <button type="submit">अपलोड करें</button>
+    </form>
   </div>
+
+  <div class="reels-container" id="reelsContainer"></div>
+
+  <script>
+    async function loadReels() {
+      try {
+        const res = await fetch('/api/reels');
+        const reels = await res.json();
+        const container = document.getElementById('reelsContainer');
+        container.innerHTML = reels.map(r => `
+          <div class="reel-card">
+            <video src="${r.videoUrl}" controls></video>
+            <div class="caption">${r.caption}</div>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.log('Error loading reels');
+      }
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('video', document.getElementById('videoFile').files[0]);
+      formData.append('caption', document.getElementById('caption').value);
+
+      const btn = e.target.querySelector('button');
+      btn.textContent = 'अपलोड हो रहा है...';
+
+      try {
+        await fetch('/api/reels', { method: 'POST', body: formData });
+        alert('रील सफलतापर्वक अपलोड हो गई!');
+        document.getElementById('uploadForm').reset();
+        loadReels();
+      } catch (err) {
+        alert('अपलोड करने में विफल!');
+      } finally {
+        btn.textContent = 'अपलोड करें';
+      }
+    });
+
+    loadReels();
+  </script>
+
 </body>
 </html>
+
