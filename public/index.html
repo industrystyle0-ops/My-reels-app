@@ -45,6 +45,7 @@
     /* Bottom Left Info & Follow */
     .reel-details { position: absolute; left: 15px; bottom: 65px; z-index: 10; text-align: left; max-width: 75%; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
     .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .user-avatar-small { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #333; display: flex; align-items: center; justify-content: center; font-size: 14px; }
     .username { font-size: 15px; font-weight: bold; }
     .follow-btn { background: transparent; border: 1px solid #fff; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; }
     .follow-btn.following { background: #fff; color: #000; }
@@ -76,10 +77,10 @@
 
   <!-- 2. HOME VIEW -->
   <div id="homeView" class="app-view">
-    <div class="page-content">
+    <div class="page-content" style="padding-bottom: 70px;">
       <h2>🏠 UTGRAM होम फीड</h2>
-      <div style="margin-top: 30px; padding: 20px; background: #161616; border-radius: 12px; border: 1px solid #282828;">
-        <p style="color:#ccc; font-size:14px; line-height: 1.5;">✨ स्वागत है! नीचे रील्स वाले आइकॉन पर क्लिक करके वीडियो देखें और ➕ बटन से गैलरी से वीडियो अपलोड करें।</p>
+      <div id="homeReelsContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 15px;">
+        <!-- Home feed posts will load here -->
       </div>
     </div>
   </div>
@@ -88,19 +89,25 @@
   <div id="searchView" class="app-view">
     <div class="page-content">
       <h2>🔍 खोजें (Explore)</h2>
-      <div style="color: #666; font-size: 13px; margin-top: 40px;">लोकप्रिय ट्रेंडिंग रील्स जल्द यहाँ दिखेंगी।</div>
+      <input type="text" id="searchInput" placeholder="रील्स या यूज़र खोजें..." style="width: 100%; padding: 12px; border-radius: 8px; background: #1a1a1a; border: 1px solid #333; color: white; margin-top: 10px;" oninput="searchContent(this.value)">
+      <div id="searchResults" style="margin-top: 20px; text-align: left; color: #aaa; font-size: 13px;"></div>
     </div>
   </div>
 
   <!-- 4. PROFILE VIEW -->
   <div id="profileView" class="app-view">
-    <div class="page-content">
-      <div style="width: 85px; height: 85px; background: #333; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #e1306c;">👤</div>
+    <div class="page-content" style="padding-bottom: 70px;">
+      <div id="profileAvatarContainer" style="width: 85px; height: 85px; background: #333; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #e1306c; overflow: hidden; position: relative;">
+        <span id="profileAvatarIcon">👤</span>
+        <img id="profileAvatarImg" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+      </div>
       <h2 id="profileNameDisplay">@Bharat_Creator</h2>
       <p id="profileBioDisplay" style="color:#aaa; font-size:13px; margin-bottom: 20px;">डिजिटल क्रिएटर | UTGRAM Official App 🚀</p>
       
       <div style="background: #161616; padding: 15px; border-radius: 12px; border: 1px solid #333; text-align: left;">
         <h4 style="margin-bottom: 10px; font-size: 14px; color: #fff;">प्रोफाइल एडिट करें:</h4>
+        <p style="font-size:11px; color:#888; margin-bottom:4px;">प्रोफाइल फोटो चुनें:</p>
+        <input type="file" id="editAvatarInput" accept="image/*" style="width:100%; padding:8px; margin-bottom:10px; background:#222; border:1px solid #444; color:#fff; border-radius:6px; font-size:12px;">
         <input type="text" id="editUsernameInput" placeholder="अपना यूजरनेम (जैसे: @Bharat)" style="width:100%; padding:10px; margin-bottom:10px; background:#222; border:1px solid #444; color:#fff; border-radius:6px;">
         <input type="text" id="editBioInput" placeholder="अपना बायो लिखें..." style="width:100%; padding:10px; margin-bottom:12px; background:#222; border:1px solid #444; color:#fff; border-radius:6px;">
         <button onclick="saveProfile()" style="background:#0095f6; color:#fff; border:none; width:100%; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer;">सेव करें</button>
@@ -125,33 +132,62 @@
 
   <!-- Bottom Navigation Bar -->
   <nav class="bottom-nav">
-    <button onclick="switchTab('homeView', this)">🏠<span>होम</span></button>
+    <button onclick="switchTab('homeView', this)" class="active" id="homeNavBtn">🏠<span>होम</span></button>
     <button onclick="switchTab('searchView', this)">🔍<span>सर्च</span></button>
     <button onclick="openModal()" style="color:#0095f6;">➕<span>अपलोड</span></button>
-    <button onclick="switchTab('reelsView', this)" class="active">🎬<span>रील्स</span></button>
-    <button onclick="switchTab('profileView', this)" id="profileNavBtn">👤<span>प्रोफाइल</span></button>
+    <button onclick="switchTab('reelsView', this)">🎬<span>रील्स</span></button>
+    <button onclick="switchTab('profileView', this)">👤<span>प्रोफाइल</span></button>
   </nav>
 
   <script>
     let currentUser = localStorage.getItem('utgram_user') || '@Bharat_Creator';
     let currentBio = localStorage.getItem('utgram_bio') || 'डिजिटल क्रिएटर | UTGRAM Official App 🚀';
+    let currentAvatar = localStorage.getItem('utgram_avatar') || '';
 
+    // Load saved profile data on startup
     document.getElementById('editUsernameInput').value = currentUser;
     document.getElementById('editBioInput').value = currentBio;
     document.getElementById('profileNameDisplay').textContent = currentUser;
     document.getElementById('profileBioDisplay').textContent = currentBio;
 
+    if(currentAvatar) {
+      document.getElementById('profileAvatarIcon').style.display = 'none';
+      const avatarImg = document.getElementById('profileAvatarImg');
+      avatarImg.src = currentAvatar;
+      avatarImg.style.display = 'block';
+    }
+
     function saveProfile() {
       const uInput = document.getElementById('editUsernameInput').value.trim();
       const bInput = document.getElementById('editBioInput').value.trim();
+      const avatarFile = document.getElementById('editAvatarInput').files[0];
+
       if(uInput) {
         currentUser = uInput.startsWith('@') ? uInput : '@' + uInput;
         currentBio = bInput || currentBio;
         localStorage.setItem('utgram_user', currentUser);
         localStorage.setItem('utgram_bio', currentBio);
+
         document.getElementById('profileNameDisplay').textContent = currentUser;
         document.getElementById('profileBioDisplay').textContent = currentBio;
-        alert('प्रोफाइल सफलताપर्वक अपडेट हो गई!');
+
+        if(avatarFile) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            currentAvatar = e.target.result;
+            localStorage.setItem('utgram_avatar', currentAvatar);
+            document.getElementById('profileAvatarIcon').style.display = 'none';
+            const avatarImg = document.getElementById('profileAvatarImg');
+            avatarImg.src = currentAvatar;
+            avatarImg.style.display = 'block';
+            alert('प्रोफाइल और फोटो सफलताપर्वक अपडेट हो गए!');
+            loadReels();
+          };
+          reader.readAsDataURL(avatarFile);
+        } else {
+          alert('प्रोफाइल सफलताપर्वक अपडेट हो गई!');
+          loadReels();
+        }
       }
     }
 
@@ -161,6 +197,10 @@
       
       document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
       if(btn) btn.classList.add('active');
+
+      if(viewId === 'homeView') {
+        loadHomeFeed();
+      }
     }
 
     function openModal() { document.getElementById('uploadModal').style.display = 'flex'; }
@@ -173,18 +213,20 @@
         .catch(err => { alert('कैमरा और माइक की अनुमति चाहिए।'); });
     }
 
+    let globalReels = [];
+
     async function loadReels() {
       try {
         const res = await fetch('/api/reels');
-        const reels = await res.json();
+        globalReels = await res.json();
         const container = document.getElementById('reelsContainer');
 
-        if(!reels || reels.length === 0) {
+        if(!globalReels || globalReels.length === 0) {
           container.innerHTML = `<div style="padding-top:200px; text-align:center; color:#888; padding:20px;">कोई रील नहीं मिली।<br>नीचे ➕ अपलोड बटन से वीडियो जोड़ें!</div>`;
           return;
         }
 
-        container.innerHTML = reels.map((r) => `
+        container.innerHTML = globalReels.map((r) => `
           <div class="reel-card" onclick="handleVideoClick(event, this)">
             <video src="${r.videoUrl}" loop playsinline preload="auto"></video>
             <div class="double-tap-heart">❤️</div>
@@ -206,6 +248,9 @@
 
             <div class="reel-details" onclick="event.stopPropagation()">
               <div class="user-row">
+                <div class="user-avatar-small">
+                  ${r.userAvatar ? `<img src="${r.userAvatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '👤'}
+                </div>
                 <span class="username">${r.username}</span>
                 <button class="follow-btn" onclick="toggleFollow(this)">फॉलो करें</button>
               </div>
@@ -220,6 +265,46 @@
       }
     }
 
+    function loadHomeFeed() {
+      const homeContainer = document.getElementById('homeReelsContainer');
+      if(!globalReels || globalReels.length === 0) {
+        homeContainer.innerHTML = `<p style="color:#777; font-size:13px; text-align:center; margin-top:20px;">होम फीड पर दिखाने के लिए कोई पोस्ट नहीं है।</p>`;
+        return;
+      }
+
+      homeContainer.innerHTML = globalReels.map(r => `
+        <div style="background:#111; border:1px solid #222; border-radius:12px; overflow:hidden; margin-bottom:15px;">
+          <div style="padding:10px 12px; display:flex; align-items:center; gap:10px;">
+            <div style="width:30px; height:30px; border-radius:50%; background:#333; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+              ${r.userAvatar ? `<img src="${r.userAvatar}" style="width:100%;height:100%;object-fit:cover;">` : '👤'}
+            </div>
+            <span style="font-size:13px; font-weight:bold; color:#fff;">${r.username}</span>
+          </div>
+          <video src="${r.videoUrl}" controls style="width:100%; max-height:350px; object-fit:cover; background:#000;"></video>
+          <div style="padding:10px 12px; font-size:13px; color:#ddd;">${r.caption}</div>
+        </div>
+      `).join('');
+    }
+
+    function searchContent(query) {
+      const resultsDiv = document.getElementById('searchResults');
+      if(!query.trim()) {
+        resultsDiv.innerHTML = '';
+        return;
+      }
+      const filtered = globalReels.filter(r => r.caption.toLowerCase().includes(query.toLowerCase()) || r.username.toLowerCase().includes(query.toLowerCase()));
+      if(filtered.length === 0) {
+        resultsDiv.innerHTML = '<p style="color:#666;">कोई परिणाम नहीं मिला।</p>';
+        return;
+      }
+      resultsDiv.innerHTML = filtered.map(r => `
+        <div style="background:#141414; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #262626;">
+          <span style="color:#fff; font-weight:bold; font-size:13px;">${r.username}</span>
+          <p style="color:#aaa; font-size:12px; margin-top:4px;">${r.caption}</p>
+        </div>
+      `).join('');
+    }
+
     let lastClickTime = 0;
     function handleVideoClick(e, card) {
       const currentTime = new Date().getTime();
@@ -230,10 +315,8 @@
       if (tapLength < 300 && tapLength > 0) {
         heart.classList.add('show');
         setTimeout(() => heart.classList.remove('show'), 600);
-        // Trigger like via UI if not already liked
         const likeBtn = card.querySelector('.action-btn');
         if (!likeBtn.classList.contains('liked')) {
-          const reelId = card.querySelector('video').src; // fallback identifier or let's trigger click
           likeBtn.click();
         }
         e.preventDefault();
@@ -311,37 +394,14 @@
       submitBtn.textContent = 'अपलोड हो रहा है...';
       submitBtn.disabled = true;
 
-      // Convert local video file to temporary safe local url for app stream
       const videoUrl = URL.createObjectURL(file);
 
       try {
         const response = await fetch('/api/reels', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ videoUrl, caption, username: currentUser })
-        });
-        
-        if(response.ok) {
-          closeModal();
-          alert('रील सफलताપर्वक पब्लिश हो गई!');
-          document.getElementById('uploadForm').reset();
-          submitBtn.textContent = 'पब्लिश करें';
-          submitBtn.disabled = false;
-          loadReels();
-        } else {
-          alert('पब्लिश करने में एरर आया!');
-          submitBtn.textContent = 'पब्लिश करें';
-          submitBtn.disabled = false;
-        }
-      } catch (err) {
-        alert('सर्वर कनेक्शन एरर!');
-        submitBtn.textContent = 'पब्लिश करें';
-        submitBtn.disabled = false;
-      }
-    });
-
-    loadReels();
-  </script>
-
-</body>
-</html>
+          body: JSON.stringify({ 
+            videoUrl, 
+            caption, 
+            username: currentUser, 
+         
