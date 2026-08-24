@@ -1,47 +1,35 @@
 const express = require('express');
-const multer = require('multer');
-const Datastore = require('nedb-promises');
-const path = require('path');
-
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static('public'));
 
-const db = Datastore.create({ filename: 'reels.db', autoload: true });
+let reels = [
+  {
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    caption: "UTGRAM पर आपका स्वागत है! 🚀"
+  },
+  {
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    caption: "यह एक शानदार रील है 🔥"
+  }
+];
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'public/uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+app.get('/api/reels', (req, res) => {
+  res.json(reels);
 });
 
-const upload = multer({ storage });
-
-app.get('/api/reels', async (req, res) => {
-  try {
-    const reels = await db.find({}).sort({ createdAt: -1 });
-    res.json(reels);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+app.post('/api/reels', (req, res) => {
+  const { videoUrl, caption } = req.body;
+  if(videoUrl && caption) {
+    reels.unshift({ videoUrl, caption });
+    res.json({ success: true, message: 'Reel added successfully!' });
+  } else {
+    res.status(400).json({ success: false, message: 'Invalid data' });
   }
 });
 
-app.post('/api/reels', upload.single('video'), async (req, res) => {
-  try {
-    const newReel = {
-      videoUrl: `/uploads/${req.file.filename}`,
-      caption: req.body.caption || '',
-      likes: 0,
-      createdAt: new Date()
-    };
-    const savedReel = await db.insert(newReel);
-    res.json(savedReel);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
