@@ -6,20 +6,20 @@
   <title>UTGRAM</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #000; color: #fff; font-family: sans-serif; overflow-x: hidden; }
+    body { background: #000; color: #fff; font-family: sans-serif; overflow-x: hidden; padding-top: 55px; }
     
-    /* Top Header */
-    header { position: fixed; top: 0; width: 100%; z-index: 100; background: rgba(0,0,0,0.9); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+    /* Top Header - Safely pushed below battery/status bar */
+    header { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; background: rgba(0,0,0,0.95); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
     .logo-container { display: flex; align-items: center; gap: 8px; }
     .logo-img { width: 30px; height: 30px; border-radius: 6px; object-fit: cover; border: 1px solid #444; }
     .logo-text { font-size: 18px; font-weight: bold; letter-spacing: 1px; color: #fff; }
     
     .top-actions { display: flex; gap: 8px; align-items: center; }
-    .nav-btn { background: #222; color: white; border: 1px solid #444; padding: 5px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; cursor: pointer; }
+    .nav-btn { background: #222; color: white; border: 1px solid #444; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; cursor: pointer; }
     .live-btn { background: #ff0055; border: none; }
 
-    /* Bottom Navigation Bar (Instagram Style) */
-    .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 55px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
+    /* Bottom Navigation Bar */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 55px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
     .bottom-nav button { background: none; border: none; color: #aaa; font-size: 20px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
     .bottom-nav button.active { color: #fff; }
     .bottom-nav button span { font-size: 9px; margin-top: 2px; }
@@ -27,24 +27,24 @@
     /* Modal / Popups */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; align-items: center; justify-content: center; }
     .modal-content { background: #111; padding: 20px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; border: 1px solid #333; }
-    .modal-content input { width: 100%; margin: 10px 0; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: white; }
+    .modal-content input { width: 100%; margin: 10px 0; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: white; font-size: 14px; }
 
     /* Views / Pages */
-    .app-view { display: none; width: 100vw; height: 100vh; padding-top: 50px; padding-bottom: 55px; overflow-y: auto; }
+    .app-view { display: none; width: 100vw; height: calc(100vh - 55px); overflow-y: auto; }
     .app-view.active { display: block; }
 
     /* Reels Feed View */
-    #reelsView { padding-top: 0; padding-bottom: 0; overflow-y: scroll; scroll-snap-type: y mandatory; height: 100vh; }
-    .reel-card { width: 100vw; height: 100vh; scroll-snap-align: start; position: relative; background: #000; display: flex; justify-content: center; align-items: center; }
+    #reelsView { padding-top: 0; overflow-y: scroll; scroll-snap-type: y mandatory; height: calc(100vh - 55px); }
+    .reel-card { width: 100vw; height: calc(100vh - 55px); scroll-snap-align: start; position: relative; background: #000; display: flex; justify-content: center; align-items: center; }
     video { width: 100%; height: 100%; object-fit: cover; }
 
     /* Right Action Buttons */
-    .reel-actions { position: absolute; right: 12px; bottom: 85px; display: flex; flex-direction: column; gap: 16px; align-items: center; z-index: 10; }
+    .reel-actions { position: absolute; right: 12px; bottom: 75px; display: flex; flex-direction: column; gap: 16px; align-items: center; z-index: 10; }
     .action-btn { background: none; border: none; color: white; display: flex; flex-direction: column; align-items: center; font-size: 20px; cursor: pointer; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
     .action-btn span { font-size: 11px; margin-top: 3px; font-weight: 500; }
 
     /* Bottom Left Info & Follow */
-    .reel-details { position: absolute; left: 15px; bottom: 65px; z-index: 10; text-align: left; max-width: 70%; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+    .reel-details { position: absolute; left: 15px; bottom: 55px; z-index: 10; text-align: left; max-width: 70%; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
     .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
     .username { font-size: 15px; font-weight: bold; }
     .follow-btn { background: transparent; border: 1px solid #fff; color: white; padding: 3px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; cursor: pointer; }
@@ -55,7 +55,7 @@
     .double-tap-heart { position: absolute; font-size: 80px; color: #ff3040; transform: scale(0); transition: transform 0.2s ease, opacity 0.2s ease; pointer-events: none; z-index: 50; }
     .double-tap-heart.show { transform: scale(1); opacity: 1; }
 
-    /* Generic Page Styling (Home, Search, Profile) */
+    /* Generic Page Styling */
     .page-content { padding: 20px; text-align: center; }
     .page-content h2 { margin-bottom: 15px; color: #fff; }
     .search-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; font-size: 14px; margin-bottom: 20px; }
@@ -74,16 +74,15 @@
     </div>
   </header>
 
-  <!-- 1. REELS VIEW (Default Feed) -->
+  <!-- 1. REELS VIEW -->
   <div id="reelsView" class="app-view active">
     <div class="reels-container" id="reelsContainer"></div>
   </div>
 
-  <!-- 2. HOME / FEED VIEW -->
+  <!-- 2. HOME VIEW -->
   <div id="homeView" class="app-view">
     <div class="page-content">
       <h2>🏠 UTGRAM होम फीड</h2>
-      <p style="color:#aaa; font-size:14px;">यहाँ आपके फॉलो किए गए लोगों की पोस्ट और रील्स दिखेंगी।</p>
       <div style="margin-top: 30px; padding: 20px; background: #111; border-radius: 10px; border: 1px solid #222;">
         <p>✨ स्वागत है भरत भाई! नीचे रील्स वाले आइकॉन पर क्लिक करके वीडियो देखना शुरू करें।</p>
       </div>
@@ -113,13 +112,13 @@
     </div>
   </div>
 
-  <!-- Upload Modal (File Manager) -->
+  <!-- Upload Modal (URL Based to prevent errors) -->
   <div class="modal" id="uploadModal">
     <div class="modal-content">
-      <h3 style="margin-bottom:12px;">फाइल मैनेजर से वीडियो अपलोड करें</h3>
+      <h3 style="margin-bottom:12px;">वीडियो लिंक से अपलोड करें</h3>
       <form id="uploadForm">
-        <input type="file" id="videoFile" accept="video/*" required style="background:#222; color:#fff; border:1px solid #333; padding:8px; border-radius:6px; width:100%;">
-        <input type="text" id="caption" placeholder="कैप्शन लिखें..." required>
+        <input type="url" id="videoUrlInput" placeholder="वीडियो का डायरेक्ट लिंक (URL) यहाँ डालें..." required>
+        <input type="text" id="captionInput" placeholder="कैप्शन लिखें..." required>
         <button type="submit" style="background:#e50914; color:white; border:none; width:100%; margin-top:15px; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer;">पब्लिश करें</button>
         <button type="button" onclick="closeModal()" style="background:none; color:#aaa; border:none; margin-top:12px; cursor:pointer; font-size:13px;">रद्द करें</button>
       </form>
@@ -161,7 +160,7 @@
         const container = document.getElementById('reelsContainer');
 
         if(!reels || reels.length === 0) {
-          container.innerHTML = `<div style="padding-top:250px; text-align:center; color:#888;">कोई रील नहीं मिली।<br>नीचे ➕ अपलोड बटन से वीडियो डालें!</div>`;
+          container.innerHTML = `<div style="padding-top:200px; text-align:center; color:#888; padding:20px;">कोई रील नहीं मिली।<br>नीचे ➕ अपलोड बटन से वीडियो लिंक डालकर जोड़ें!</div>`;
           return;
         }
 
@@ -170,7 +169,6 @@
             <video src="${r.videoUrl}" loop playsinline></video>
             <div class="double-tap-heart">❤️</div>
             
-            <!-- Right Actions (Strict Order: Like, Comment, Share, Save, Download) -->
             <div class="reel-actions">
               <button class="action-btn" onclick="event.stopPropagation(); toggleLikeBtn(this)">
                 ❤️ <span class="like-count">142</span>
@@ -189,7 +187,6 @@
               </a>
             </div>
 
-            <!-- Bottom Left User & Follow -->
             <div class="reel-details" onclick="event.stopPropagation()">
               <div class="user-row">
                 <span class="username">@UTGRAM_Creator</span>
@@ -266,20 +263,23 @@
 
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const formData = new FormData();
-      formData.append('video', document.getElementById('videoFile').files[0]);
-      formData.append('caption', document.getElementById('caption').value);
+      const videoUrl = document.getElementById('videoUrlInput').value;
+      const caption = document.getElementById('captionInput').value;
 
       closeModal();
-      alert('वीडियो अपलोड हो रहा है...');
+      alert('वीडियो पब्लिश हो रहा है...');
 
       try {
-        await fetch('/api/reels', { method: 'POST', body: formData });
-        alert('रील पब्लिश हो गई!');
+        await fetch('/api/reels', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoUrl, caption })
+        });
+        alert('रील सफलतापर्वक पब्लिश हो गई!');
         document.getElementById('uploadForm').reset();
         loadReels();
       } catch (err) {
-        alert('अपलोड करने में एरर आया!');
+        alert('पब्लिश करने में एरर आया!');
       }
     });
 
@@ -288,4 +288,3 @@
 
 </body>
 </html>
-
