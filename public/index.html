@@ -28,11 +28,11 @@
     .modal-content p { font-size: 12px; color: #aaa; margin-bottom: 8px; text-align: left; }
 
     /* Views / Pages */
-    .app-view { display: none; width: 100vw; height: calc(100vh - 110px); overflow-y: auto; }
+    .app-view { display: none; width: 100vw; height: calc(100vh - 55px); overflow-y: auto; }
     .app-view.active { display: block; }
 
     /* Reels Feed View */
-    #reelsView { padding-top: 0; overflow-y: scroll; scroll-snap-type: y mandatory; height: calc(100vh - 55px); }
+    #reelsView { padding-top: 0; overflow-y: scroll; scroll-snap-type: y mandatory; }
     .reel-card { width: 100vw; height: calc(100vh - 55px); scroll-snap-align: start; position: relative; background: #000; display: flex; justify-content: center; align-items: center; }
     video { width: 100%; height: 100%; object-fit: cover; }
 
@@ -45,7 +45,7 @@
     /* Bottom Left Info & Follow */
     .reel-details { position: absolute; left: 15px; bottom: 65px; z-index: 10; text-align: left; max-width: 75%; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
     .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .user-avatar-small { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #333; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .user-avatar-small { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #333; display: flex; align-items: center; justify-content: center; font-size: 14px; overflow: hidden; }
     .username { font-size: 15px; font-weight: bold; }
     .follow-btn { background: transparent; border: 1px solid #fff; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; }
     .follow-btn.following { background: #fff; color: #000; }
@@ -79,9 +79,7 @@
   <div id="homeView" class="app-view">
     <div class="page-content" style="padding-bottom: 70px;">
       <h2>🏠 UTGRAM होम फीड</h2>
-      <div id="homeReelsContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 15px;">
-        <!-- Home feed posts will load here -->
-      </div>
+      <div id="homeReelsContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 15px;"></div>
     </div>
   </div>
 
@@ -115,7 +113,7 @@
     </div>
   </div>
 
-  <!-- Upload Modal (Gallery Video Selector) -->
+  <!-- Upload Modal -->
   <div class="modal" id="uploadModal">
     <div class="modal-content">
       <h3 style="margin-bottom:15px; color:#fff;">गैलरी से रील अपलोड करें</h3>
@@ -132,10 +130,10 @@
 
   <!-- Bottom Navigation Bar -->
   <nav class="bottom-nav">
-    <button onclick="switchTab('homeView', this)" class="active" id="homeNavBtn">🏠<span>होम</span></button>
+    <button onclick="switchTab('homeView', this)">🏠<span>होम</span></button>
     <button onclick="switchTab('searchView', this)">🔍<span>सर्च</span></button>
     <button onclick="openModal()" style="color:#0095f6;">➕<span>अपलोड</span></button>
-    <button onclick="switchTab('reelsView', this)">🎬<span>रील्स</span></button>
+    <button onclick="switchTab('reelsView', this)" class="active" id="reelsNavBtn">🎬<span>रील्स</span></button>
     <button onclick="switchTab('profileView', this)">👤<span>प्रोफाइल</span></button>
   </nav>
 
@@ -180,12 +178,12 @@
             const avatarImg = document.getElementById('profileAvatarImg');
             avatarImg.src = currentAvatar;
             avatarImg.style.display = 'block';
-            alert('प्रोफाइल और फोटो सफलताપर्वक अपडेट हो गए!');
+            alert('प्रोफाइल और फोटो सफलतापूर्वक अपडेट हो गए!');
             loadReels();
           };
           reader.readAsDataURL(avatarFile);
         } else {
-          alert('प्रोफाइल सफलताપर्वक अपडेट हो गई!');
+          alert('प्रोफाइल सफलतापूर्वक अपडेट हो गई!');
           loadReels();
         }
       }
@@ -195,16 +193,27 @@
       document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
       
-      document.querySelectorAll('.bottom-nav button').forEach(b => b.classList.remove('active'));
-      if(btn) btn.classList.add('active');
+      document.querySelectorAll('.bottom-nav button').forEach(b => {
+        if(b.onclick && !b.onclick.toString().includes('openModal')) {
+          b.classList.remove('active');
+        }
+      });
+      if(btn && !btn.onclick.toString().includes('openModal')) {
+        btn.classList.add('active');
+      }
 
       if(viewId === 'homeView') {
         loadHomeFeed();
       }
     }
 
-    function openModal() { document.getElementById('uploadModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('uploadModal').style.display = 'none'; }
+    function openModal() { 
+      document.getElementById('uploadModal').style.display = 'flex'; 
+    }
+    
+    function closeModal() { 
+      document.getElementById('uploadModal').style.display = 'none'; 
+    }
 
     function startLive() {
       alert('🔴 लाइव ब्रॉडकास्ट मोड शुरू हो रहा है!');
@@ -400,8 +409,4 @@
         const response = await fetch('/api/reels', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            videoUrl, 
-            caption, 
-            username: currentUser, 
-         
+          body
