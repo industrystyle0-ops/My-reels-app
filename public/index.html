@@ -24,7 +24,7 @@
     /* Modal / Popups */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center; }
     .modal-content { background: #121212; padding: 22px; border-radius: 16px; width: 90%; max-width: 360px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .modal-content input { width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #1e1e1e; color: white; font-size: 14px; }
+    .modal-content input, .modal-content textarea { width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #1e1e1e; color: white; font-size: 14px; }
     .modal-content p { font-size: 12px; color: #aaa; margin-bottom: 8px; text-align: left; }
 
     /* Views / Pages */
@@ -40,6 +40,7 @@
     .reel-actions { position: absolute; right: 12px; bottom: 75px; display: flex; flex-direction: column; gap: 16px; align-items: center; z-index: 10; }
     .action-btn { background: none; border: none; color: white; display: flex; flex-direction: column; align-items: center; font-size: 22px; cursor: pointer; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
     .action-btn span { font-size: 11px; margin-top: 4px; font-weight: 600; }
+    .action-btn.liked { color: #ff3040; }
 
     /* Bottom Left Info & Follow */
     .reel-details { position: absolute; left: 15px; bottom: 65px; z-index: 10; text-align: left; max-width: 75%; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
@@ -78,7 +79,7 @@
     <div class="page-content">
       <h2>🏠 UTGRAM होम फीड</h2>
       <div style="margin-top: 30px; padding: 20px; background: #161616; border-radius: 12px; border: 1px solid #282828;">
-        <p style="color:#ccc; font-size:14px; line-height: 1.5;">✨ स्वागत है भरत भाई! नीचे रील्स वाले आइकॉन पर क्लिक करके वीडियो देखना शुरू करें और ➕ बटन से अपनी रील्स अपलोड करें।</p>
+        <p style="color:#ccc; font-size:14px; line-height: 1.5;">✨ स्वागत है! नीचे रील्स वाले आइकॉन पर क्लिक करके वीडियो देखें और ➕ बटन से गैलरी से वीडियो अपलोड करें।</p>
       </div>
     </div>
   </div>
@@ -95,21 +96,28 @@
   <div id="profileView" class="app-view">
     <div class="page-content">
       <div style="width: 85px; height: 85px; background: #333; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #e1306c;">👤</div>
-      <h2>@Bharat_Creator</h2>
-      <p style="color:#aaa; font-size:13px; margin-bottom: 20px;">डिजिटल क्रिएटर | UTGRAM Official App 🚀</p>
+      <h2 id="profileNameDisplay">@Bharat_Creator</h2>
+      <p id="profileBioDisplay" style="color:#aaa; font-size:13px; margin-bottom: 20px;">डिजिटल क्रिएटर | UTGRAM Official App 🚀</p>
+      
+      <div style="background: #161616; padding: 15px; border-radius: 12px; border: 1px solid #333; text-align: left;">
+        <h4 style="margin-bottom: 10px; font-size: 14px; color: #fff;">प्रोफाइल एडिट करें:</h4>
+        <input type="text" id="editUsernameInput" placeholder="अपना यूजरनेम (जैसे: @Bharat)" style="width:100%; padding:10px; margin-bottom:10px; background:#222; border:1px solid #444; color:#fff; border-radius:6px;">
+        <input type="text" id="editBioInput" placeholder="अपना बायो लिखें..." style="width:100%; padding:10px; margin-bottom:12px; background:#222; border:1px solid #444; color:#fff; border-radius:6px;">
+        <button onclick="saveProfile()" style="background:#0095f6; color:#fff; border:none; width:100%; padding:10px; border-radius:6px; font-weight:bold; cursor:pointer;">सेव करें</button>
+      </div>
     </div>
   </div>
 
-  <!-- Upload Modal -->
+  <!-- Upload Modal (Gallery Video Selector) -->
   <div class="modal" id="uploadModal">
     <div class="modal-content">
-      <h3 style="margin-bottom:15px; color:#fff;">नई रील अपलोड करें</h3>
+      <h3 style="margin-bottom:15px; color:#fff;">गैलरी से रील अपलोड करें</h3>
       <form id="uploadForm">
-        <p>वीडियो का डायरेक्ट लिंक (.mp4 URL) डालें:</p>
-        <input type="url" id="videoUrlInput" placeholder="जैसे: https://example.com/video.mp4" required>
+        <p>अपने फोन से वीडियो चुनें:</p>
+        <input type="file" id="videoFileInput" accept="video/*" required style="padding: 8px;">
         <p style="margin-top: 10px;">कैप्शन लिखें:</p>
         <input type="text" id="captionInput" placeholder="अपनी रील के बारे में कुछ लिखें..." required>
-        <button type="submit" style="background:#0095f6; color:white; border:none; width:100%; margin-top:15px; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:14px;">पब्लिश करें</button>
+        <button type="submit" id="uploadSubmitBtn" style="background:#0095f6; color:white; border:none; width:100%; margin-top:15px; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:14px;">पब्लिश करें</button>
         <button type="button" onclick="closeModal()" style="background:none; color:#aaa; border:none; margin-top:12px; cursor:pointer; font-size:13px;">रद्द करें</button>
       </form>
     </div>
@@ -121,10 +129,32 @@
     <button onclick="switchTab('searchView', this)">🔍<span>सर्च</span></button>
     <button onclick="openModal()" style="color:#0095f6;">➕<span>अपलोड</span></button>
     <button onclick="switchTab('reelsView', this)" class="active">🎬<span>रील्स</span></button>
-    <button onclick="switchTab('profileView', this)">👤<span>प्रोफाइल</span></button>
+    <button onclick="switchTab('profileView', this)" id="profileNavBtn">👤<span>प्रोफाइल</span></button>
   </nav>
 
   <script>
+    let currentUser = localStorage.getItem('utgram_user') || '@Bharat_Creator';
+    let currentBio = localStorage.getItem('utgram_bio') || 'डिजिटल क्रिएटर | UTGRAM Official App 🚀';
+
+    document.getElementById('editUsernameInput').value = currentUser;
+    document.getElementById('editBioInput').value = currentBio;
+    document.getElementById('profileNameDisplay').textContent = currentUser;
+    document.getElementById('profileBioDisplay').textContent = currentBio;
+
+    function saveProfile() {
+      const uInput = document.getElementById('editUsernameInput').value.trim();
+      const bInput = document.getElementById('editBioInput').value.trim();
+      if(uInput) {
+        currentUser = uInput.startsWith('@') ? uInput : '@' + uInput;
+        currentBio = bInput || currentBio;
+        localStorage.setItem('utgram_user', currentUser);
+        localStorage.setItem('utgram_bio', currentBio);
+        document.getElementById('profileNameDisplay').textContent = currentUser;
+        document.getElementById('profileBioDisplay').textContent = currentBio;
+        alert('प्रोफाइल सफलताપर्वक अपडेट हो गई!');
+      }
+    }
+
     function switchTab(viewId, btn) {
       document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
@@ -160,13 +190,13 @@
             <div class="double-tap-heart">❤️</div>
             
             <div class="reel-actions">
-              <button class="action-btn" onclick="event.stopPropagation(); toggleLikeBtn(this)">
-                ❤️ <span class="like-count" style="font-size:11px;">142</span>
+              <button class="action-btn ${r.likedByMe ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike(${r.id}, this)">
+                ❤️ <span class="like-count" style="font-size:11px;">${r.likes}</span>
               </button>
               <button class="action-btn" onclick="event.stopPropagation(); alert('कमेंट्स बॉक्स खुल रहा है!')">
                 💬 <span style="font-size:11px;">18</span>
               </button>
-              <button class="action-btn" onclick="event.stopPropagation(); shareReel('${r.videoUrl}')">
+              <button class="action-btn" onclick="event.stopPropagation(); shareReel()">
                 🚀 <span style="font-size:11px;">शेयर</span>
               </button>
               <button class="action-btn" onclick="event.stopPropagation(); alert('रील सेव हो गई!')">
@@ -176,7 +206,7 @@
 
             <div class="reel-details" onclick="event.stopPropagation()">
               <div class="user-row">
-                <span class="username">@Bharat_Creator</span>
+                <span class="username">${r.username}</span>
                 <button class="follow-btn" onclick="toggleFollow(this)">फॉलो करें</button>
               </div>
               <div class="caption">${r.caption}</div>
@@ -200,14 +230,40 @@
       if (tapLength < 300 && tapLength > 0) {
         heart.classList.add('show');
         setTimeout(() => heart.classList.remove('show'), 600);
-        const likeCountSpan = card.querySelector('.like-count');
-        likeCountSpan.textContent = parseInt(likeCountSpan.textContent) + 1;
+        // Trigger like via UI if not already liked
+        const likeBtn = card.querySelector('.action-btn');
+        if (!likeBtn.classList.contains('liked')) {
+          const reelId = card.querySelector('video').src; // fallback identifier or let's trigger click
+          likeBtn.click();
+        }
         e.preventDefault();
       } else {
         if (video.paused) video.play();
         else video.pause();
       }
       lastClickTime = currentTime;
+    }
+
+    async function toggleLike(id, btn) {
+      try {
+        const res = await fetch('/api/reels/like', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if(data.success) {
+          const countSpan = btn.querySelector('.like-count');
+          countSpan.textContent = data.likes;
+          if(data.likedByMe) {
+            btn.classList.add('liked');
+          } else {
+            btn.classList.remove('liked');
+          }
+        }
+      } catch(err) {
+        console.log('Like error');
+      }
     }
 
     function setupVideoObserver() {
@@ -222,13 +278,6 @@
       document.querySelectorAll('.reel-card').forEach(card => observer.observe(card));
     }
 
-    function toggleLikeBtn(btn) {
-      const count = btn.querySelector('.like-count');
-      count.textContent = parseInt(count.textContent) + 1;
-      btn.style.transform = 'scale(1.2)';
-      setTimeout(() => btn.style.transform = 'scale(1)', 200);
-    }
-
     function toggleFollow(btn) {
       if (btn.classList.contains('following')) {
         btn.classList.remove('following');
@@ -239,7 +288,7 @@
       }
     }
 
-    function shareReel(url) {
+    function shareReel() {
       if (navigator.share) {
         navigator.share({ title: 'UTGRAM Reel', url: window.location.origin }).catch(e => {});
       } else {
@@ -249,28 +298,45 @@
 
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const videoUrl = document.getElementById('videoUrlInput').value;
+      const fileInput = document.getElementById('videoFileInput');
       const caption = document.getElementById('captionInput').value;
+      const submitBtn = document.getElementById('uploadSubmitBtn');
 
-      closeModal();
-      alert('रील पब्लिश हो रही है...');
+      if(fileInput.files.length === 0) {
+        alert('कृपया वीडियो चुनें!');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      submitBtn.textContent = 'अपलोड हो रहा है...';
+      submitBtn.disabled = true;
+
+      // Convert local video file to temporary safe local url for app stream
+      const videoUrl = URL.createObjectURL(file);
 
       try {
         const response = await fetch('/api/reels', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ videoUrl, caption })
+          body: JSON.stringify({ videoUrl, caption, username: currentUser })
         });
         
         if(response.ok) {
-          alert('रील सफलतापर्वक पब्लिश हो गई!');
+          closeModal();
+          alert('रील सफलताપर्वक पब्लिश हो गई!');
           document.getElementById('uploadForm').reset();
+          submitBtn.textContent = 'पब्लिश करें';
+          submitBtn.disabled = false;
           loadReels();
         } else {
           alert('पब्लिश करने में एरर आया!');
+          submitBtn.textContent = 'पब्लिश करें';
+          submitBtn.disabled = false;
         }
       } catch (err) {
         alert('सर्वर कनेक्शन एरर!');
+        submitBtn.textContent = 'पब्लिश करें';
+        submitBtn.disabled = false;
       }
     });
 
