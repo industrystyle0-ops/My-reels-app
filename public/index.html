@@ -8,41 +8,34 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; padding-bottom: 70px; }
     
-    /* Top Header */
     header { position: sticky; top: 0; width: 100%; z-index: 999; background: #000; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
     .logo-text { font-size: 20px; font-weight: bold; letter-spacing: 1.5px; color: #fff; font-style: italic; }
     
     .nav-btn { background: #222; color: white; border: 1px solid #444; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
     .live-btn { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border: none; }
 
-    /* Bottom Navigation Bar - सर्वोच्च लेयर */
     .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 999999; }
     .bottom-nav button { background: none; border: none; color: #888; font-size: 22px; cursor: pointer; display: flex; flex-direction: column; align-items: center; padding: 5px 15px; width: 20%; }
     .bottom-nav button.active { color: #fff; }
     .bottom-nav button span { font-size: 9px; margin-top: 2px; }
 
-    /* Modal / Popups */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; align-items: center; justify-content: center; }
     .modal-content { background: #121212; padding: 22px; border-radius: 16px; width: 90%; max-width: 360px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     .modal-content input { width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #1e1e1e; color: white; font-size: 14px; }
     .modal-content p { font-size: 12px; color: #aaa; margin-bottom: 8px; text-align: left; }
 
-    /* Views / Pages */
     .app-view { display: none; width: 100%; min-height: calc(100vh - 115px); }
     .app-view.active { display: block; }
 
-    /* Reels Feed View */
     #reelsView { padding-top: 0; }
     .reel-card { width: 100vw; height: calc(100vh - 115px); position: relative; background: #000; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #222; }
     video { width: 100%; height: 100%; object-fit: cover; }
 
-    /* Right Action Buttons */
     .reel-actions { position: absolute; right: 12px; bottom: 20px; display: flex; flex-direction: column; gap: 16px; align-items: center; z-index: 10; }
     .action-btn { background: none; border: none; color: white; display: flex; flex-direction: column; align-items: center; font-size: 22px; cursor: pointer; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
     .action-btn span { font-size: 11px; margin-top: 4px; font-weight: 600; }
     .action-btn.liked { color: #ff3040; }
 
-    /* Bottom Left Info & Follow */
     .reel-details { position: absolute; left: 15px; bottom: 20px; z-index: 10; text-align: left; max-width: 75%; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
     .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .user-avatar-small { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #333; display: flex; align-items: center; justify-content: center; font-size: 14px; overflow: hidden; }
@@ -51,18 +44,15 @@
     .follow-btn.following { background: #fff; color: #000; }
     .caption { font-size: 14px; line-height: 1.4; color: #f1f1f1; }
 
-    /* Double Tap Heart Animation */
     .double-tap-heart { position: absolute; font-size: 90px; color: #ff3040; transform: scale(0); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease; pointer-events: none; z-index: 50; }
     .double-tap-heart.show { transform: scale(1); opacity: 1; }
 
-    /* Generic Page Styling */
     .page-content { padding: 20px; text-align: center; }
     .page-content h2 { margin-bottom: 15px; color: #fff; }
   </style>
 </head>
 <body>
 
-  <!-- Top Header -->
   <header>
     <div class="logo-text">UTGRAM</div>
     <div class="top-actions">
@@ -70,12 +60,10 @@
     </div>
   </header>
 
-  <!-- 1. REELS VIEW -->
   <div id="reelsView" class="app-view active">
     <div class="reels-container" id="reelsContainer"></div>
   </div>
 
-  <!-- 2. HOME VIEW -->
   <div id="homeView" class="app-view">
     <div class="page-content">
       <h2>🏠 UTGRAM होम फीड</h2>
@@ -83,7 +71,6 @@
     </div>
   </div>
 
-  <!-- 3. SEARCH VIEW -->
   <div id="searchView" class="app-view">
     <div class="page-content">
       <h2>🔍 खोजें (Explore)</h2>
@@ -92,7 +79,6 @@
     </div>
   </div>
 
-  <!-- 4. PROFILE VIEW -->
   <div id="profileView" class="app-view">
     <div class="page-content">
       <div id="profileAvatarContainer" style="width: 85px; height: 85px; background: #333; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #e1306c; overflow: hidden; position: relative;">
@@ -113,7 +99,6 @@
     </div>
   </div>
 
-  <!-- Upload Modal -->
   <div class="modal" id="uploadModal">
     <div class="modal-content">
       <h3 style="margin-bottom:15px; color:#fff;">गैलरी से रील अपलोड करें</h3>
@@ -128,7 +113,6 @@
     </div>
   </div>
 
-  <!-- Bottom Navigation Bar -->
   <nav class="bottom-nav">
     <button onclick="switchTab('homeView', this)" id="homeNavBtn">🏠<span>होम</span></button>
     <button onclick="switchTab('searchView', this)" id="searchNavBtn">🔍<span>सर्च</span></button>
@@ -143,7 +127,6 @@
     let currentAvatar = localStorage.getItem('utgram_avatar') || '';
     let globalReels = [];
 
-    // प्रोफाइल डेटा लोड करें
     try {
       document.getElementById('editUsernameInput').value = currentUser;
       document.getElementById('editBioInput').value = currentBio;
@@ -396,7 +379,7 @@
 
         if(!fileInput || fileInput.files.length === 0) {
           alert('कृपया वीडियो चुनें!');
-          return;
+        return;
         }
 
         const file = fileInput.files[0];
@@ -405,4 +388,21 @@
           submitBtn.disabled = true;
         }
 
-        const videoUrl = URL.createObjectUR
+        const videoUrl = URL.createObjectURL(file);
+
+        try {
+          const response = await fetch('/api/reels', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              videoUrl, 
+              caption, 
+              username: currentUser, 
+              userAvatar: currentAvatar 
+            })
+          });
+          
+          if(response && response.ok) {
+            closeModal();
+            alert('रील सफलतापूर्वक पब्लिश हो गई!');
+  
