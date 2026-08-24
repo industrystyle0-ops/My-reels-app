@@ -11,6 +11,7 @@ let reels = [
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
     caption: "UTGRAM पर आपका स्वागत है! 🚀",
     username: "@Bharat_Creator",
+    userAvatar: "",
     likes: 142,
     likedByMe: false
   },
@@ -19,6 +20,7 @@ let reels = [
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
     caption: "यह एक शानदार रील है 🔥",
     username: "@Bharat_Creator",
+    userAvatar: "",
     likes: 89,
     likedByMe: false
   }
@@ -29,13 +31,14 @@ app.get('/api/reels', (req, res) => {
 });
 
 app.post('/api/reels', (req, res) => {
-  const { videoUrl, caption, username } = req.body;
+  const { videoUrl, caption, username, userAvatar } = req.body;
   if(videoUrl && caption) {
     reels.unshift({
       id: Date.now(),
       videoUrl,
       caption,
       username: username || "@Bharat_Creator",
+      userAvatar: userAvatar || "",
       likes: 0,
       likedByMe: false
     });
