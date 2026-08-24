@@ -6,34 +6,34 @@
   <title>UTGRAM</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; padding-bottom: 60px; }
+    body { background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; padding-bottom: 70px; }
     
     /* Top Header */
-    header { position: sticky; top: 0; width: 100%; z-index: 999; background: #000; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+    header { position: sticky; top: 0; width: 100%; z-index: 999; background: #000; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
     .logo-text { font-size: 20px; font-weight: bold; letter-spacing: 1.5px; color: #fff; font-style: italic; }
     
     .nav-btn { background: #222; color: white; border: 1px solid #444; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
     .live-btn { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border: none; }
 
-    /* Bottom Navigation Bar - FIXED z-index to stay on top */
-    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 55px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 99999; }
-    .bottom-nav button { background: none; border: none; color: #888; font-size: 22px; cursor: pointer; display: flex; flex-direction: column; align-items: center; padding: 5px 15px; }
+    /* Bottom Navigation Bar - सर्वोच्च लेयर */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 999999; }
+    .bottom-nav button { background: none; border: none; color: #888; font-size: 22px; cursor: pointer; display: flex; flex-direction: column; align-items: center; padding: 5px 15px; width: 20%; }
     .bottom-nav button.active { color: #fff; }
     .bottom-nav button span { font-size: 9px; margin-top: 2px; }
 
     /* Modal / Popups */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999999; align-items: center; justify-content: center; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; align-items: center; justify-content: center; }
     .modal-content { background: #121212; padding: 22px; border-radius: 16px; width: 90%; max-width: 360px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .modal-content input, .modal-content textarea { width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #1e1e1e; color: white; font-size: 14px; }
+    .modal-content input { width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #1e1e1e; color: white; font-size: 14px; }
     .modal-content p { font-size: 12px; color: #aaa; margin-bottom: 8px; text-align: left; }
 
     /* Views / Pages */
-    .app-view { display: none; width: 100vw; min-height: calc(100vh - 110px); }
+    .app-view { display: none; width: 100%; min-height: calc(100vh - 115px); }
     .app-view.active { display: block; }
 
     /* Reels Feed View */
     #reelsView { padding-top: 0; }
-    .reel-card { width: 100vw; height: calc(100vh - 110px); position: relative; background: #000; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #222; }
+    .reel-card { width: 100vw; height: calc(100vh - 115px); position: relative; background: #000; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #222; }
     video { width: 100%; height: 100%; object-fit: cover; }
 
     /* Right Action Buttons */
@@ -128,7 +128,7 @@
     </div>
   </div>
 
-  <!-- Bottom Navigation Bar - FIXED -->
+  <!-- Bottom Navigation Bar -->
   <nav class="bottom-nav">
     <button onclick="switchTab('homeView', this)" id="homeNavBtn">🏠<span>होम</span></button>
     <button onclick="switchTab('searchView', this)" id="searchNavBtn">🔍<span>सर्च</span></button>
@@ -141,18 +141,22 @@
     let currentUser = localStorage.getItem('utgram_user') || '@Bharat_Creator';
     let currentBio = localStorage.getItem('utgram_bio') || 'डिजिटल क्रिएटर | UTGRAM Official App 🚀';
     let currentAvatar = localStorage.getItem('utgram_avatar') || '';
+    let globalReels = [];
 
-    document.getElementById('editUsernameInput').value = currentUser;
-    document.getElementById('editBioInput').value = currentBio;
-    document.getElementById('profileNameDisplay').textContent = currentUser;
-    document.getElementById('profileBioDisplay').textContent = currentBio;
+    // प्रोफाइल डेटा लोड करें
+    try {
+      document.getElementById('editUsernameInput').value = currentUser;
+      document.getElementById('editBioInput').value = currentBio;
+      document.getElementById('profileNameDisplay').textContent = currentUser;
+      document.getElementById('profileBioDisplay').textContent = currentBio;
 
-    if(currentAvatar) {
-      document.getElementById('profileAvatarIcon').style.display = 'none';
-      const avatarImg = document.getElementById('profileAvatarImg');
-      avatarImg.src = currentAvatar;
-      avatarImg.style.display = 'block';
-    }
+      if(currentAvatar) {
+        document.getElementById('profileAvatarIcon').style.display = 'none';
+        const avatarImg = document.getElementById('profileAvatarImg');
+        avatarImg.src = currentAvatar;
+        avatarImg.style.display = 'block';
+      }
+    } catch(e) { console.error(e); }
 
     function saveProfile() {
       const uInput = document.getElementById('editUsernameInput').value.trim();
@@ -189,39 +193,44 @@
     }
 
     function switchTab(viewId, btn) {
-      document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
-      document.getElementById(viewId).classList.add('active');
-      
-      document.querySelectorAll('.bottom-nav button').forEach(b => {
-        if(b.id !== 'uploadNavBtn') {
-          b.classList.remove('active');
+      try {
+        document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+        const targetView = document.getElementById(viewId);
+        if(targetView) targetView.classList.add('active');
+        
+        document.querySelectorAll('.bottom-nav button').forEach(b => {
+          if(b.id !== 'uploadNavBtn') {
+            b.classList.remove('active');
+          }
+        });
+        if(btn && btn.id !== 'uploadNavBtn') {
+          btn.classList.add('active');
         }
-      });
-      if(btn && btn.id !== 'uploadNavBtn') {
-        btn.classList.add('active');
-      }
 
-      if(viewId === 'homeView') {
-        loadHomeFeed();
-      }
+        if(viewId === 'homeView') {
+          loadHomeFeed();
+        }
+      } catch(e) { console.error(e); }
     }
 
     function openModal() { 
-      document.getElementById('uploadModal').style.display = 'flex'; 
+      const modal = document.getElementById('uploadModal');
+      if(modal) modal.style.display = 'flex'; 
     }
     
     function closeModal() { 
-      document.getElementById('uploadModal').style.display = 'none'; 
+      const modal = document.getElementById('uploadModal');
+      if(modal) modal.style.display = 'none'; 
     }
 
     function startLive() {
       alert('🔴 लाइव ब्रॉडकास्ट मोड शुरू हो रहा है!');
-      navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then(stream => { alert('आप लाइव हैं!'); })
-        .catch(err => { alert('कैमरा और माइक की अनुमति चाहिए।'); });
+      if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+          .then(stream => { alert('आप लाइव हैं!'); })
+          .catch(err => { alert('कैमरा और माइक की अनुमति चाहिए।'); });
+      }
     }
-
-    let globalReels = [];
 
     async function loadReels() {
       try {
@@ -241,7 +250,7 @@
             
             <div class="reel-actions">
               <button class="action-btn ${r.likedByMe ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike(${r.id}, this)">
-                ❤️ <span class="like-count" style="font-size:11px;">${r.likes}</span>
+                ❤️ <span class="like-count" style="font-size:11px;">${r.likes || 0}</span>
               </button>
               <button class="action-btn" onclick="event.stopPropagation(); alert('कमेंट्स बॉक्स खुल रहा है!')">
                 💬 <span style="font-size:11px;">18</span>
@@ -259,15 +268,15 @@
                 <div class="user-avatar-small">
                   ${r.userAvatar ? `<img src="${r.userAvatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '👤'}
                 </div>
-                <span class="username">${r.username}</span>
+                <span class="username">${r.username || '@User'}</span>
                 <button class="follow-btn" onclick="toggleFollow(this)">फॉलो करें</button>
               </div>
-              <div class="caption">${r.caption}</div>
+              <div class="caption">${r.caption || ''}</div>
             </div>
           </div>
         `).join('');
       } catch (err) {
-        console.log('Error loading reels');
+        console.log('Error loading reels', err);
       }
     }
 
@@ -284,10 +293,10 @@
             <div style="width:30px; height:30px; border-radius:50%; background:#333; overflow:hidden; display:flex; align-items:center; justify-content:center;">
               ${r.userAvatar ? `<img src="${r.userAvatar}" style="width:100%;height:100%;object-fit:cover;">` : '👤'}
             </div>
-            <span style="font-size:13px; font-weight:bold; color:#fff;">${r.username}</span>
+            <span style="font-size:13px; font-weight:bold; color:#fff;">${r.username || '@User'}</span>
           </div>
           <video src="${r.videoUrl}" controls style="width:100%; max-height:350px; object-fit:cover; background:#000;"></video>
-          <div style="padding:10px 12px; font-size:13px; color:#ddd;">${r.caption}</div>
+          <div style="padding:10px 12px; font-size:13px; color:#ddd;">${r.caption || ''}</div>
         </div>
       `).join('');
     }
@@ -298,15 +307,15 @@
         resultsDiv.innerHTML = '';
         return;
       }
-      const filtered = globalReels.filter(r => r.caption.toLowerCase().includes(query.toLowerCase()) || r.username.toLowerCase().includes(query.toLowerCase()));
+      const filtered = globalReels.filter(r => (r.caption && r.caption.toLowerCase().includes(query.toLowerCase())) || (r.username && r.username.toLowerCase().includes(query.toLowerCase())));
       if(filtered.length === 0) {
         resultsDiv.innerHTML = '<p style="color:#666;">कोई परिणाम नहीं मिला।</p>';
         return;
       }
       resultsDiv.innerHTML = filtered.map(r => `
         <div style="background:#141414; padding:10px; border-radius:8px; margin-bottom:8px; border:1px solid #262626;">
-          <span style="color:#fff; font-weight:bold; font-size:13px;">${r.username}</span>
-          <p style="color:#aaa; font-size:12px; margin-top:4px;">${r.caption}</p>
+          <span style="color:#fff; font-weight:bold; font-size:13px;">${r.username || '@User'}</span>
+          <p style="color:#aaa; font-size:12px; margin-top:4px;">${r.caption || ''}</p>
         </div>
       `).join('');
     }
@@ -319,16 +328,20 @@
       const heart = card.querySelector('.double-tap-heart');
 
       if (tapLength < 300 && tapLength > 0) {
-        heart.classList.add('show');
-        setTimeout(() => heart.classList.remove('show'), 600);
+        if(heart) {
+          heart.classList.add('show');
+          setTimeout(() => heart.classList.remove('show'), 600);
+        }
         const likeBtn = card.querySelector('.action-btn');
-        if (!likeBtn.classList.contains('liked')) {
+        if (likeBtn && !likeBtn.classList.contains('liked')) {
           likeBtn.click();
         }
         e.preventDefault();
       } else {
-        if (video.paused) video.play();
-        else video.pause();
+        if (video) {
+          if (video.paused) video.play();
+          else video.pause();
+        }
       }
       lastClickTime = currentTime;
     }
@@ -341,9 +354,9 @@
           body: JSON.stringify({ id })
         });
         const data = await res.json();
-        if(data.success) {
+        if(data && data.success) {
           const countSpan = btn.querySelector('.like-count');
-          countSpan.textContent = data.likes;
+          if(countSpan) countSpan.textContent = data.likes;
           if(data.likedByMe) {
             btn.classList.add('liked');
           } else {
@@ -351,7 +364,7 @@
           }
         }
       } catch(err) {
-        console.log('Like error');
+        console.log('Like error', err);
       }
     }
 
@@ -373,42 +386,23 @@
       }
     }
 
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fileInput = document.getElementById('videoFileInput');
-      const caption = document.getElementById('captionInput').value;
-      const submitBtn = document.getElementById('uploadSubmitBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    if(uploadForm) {
+      uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('videoFileInput');
+        const caption = document.getElementById('captionInput').value;
+        const submitBtn = document.getElementById('uploadSubmitBtn');
 
-      if(fileInput.files.length === 0) {
-        alert('कृपया वीडियो चुनें!');
-        return;
-      }
+        if(!fileInput || fileInput.files.length === 0) {
+          alert('कृपया वीडियो चुनें!');
+          return;
+        }
 
-      const file = fileInput.files[0];
-      submitBtn.textContent = 'अपलोड हो रहा है...';
-      submitBtn.disabled = true;
+        const file = fileInput.files[0];
+        if(submitBtn) {
+          submitBtn.textContent = 'अपलोड हो रहा है...';
+          submitBtn.disabled = true;
+        }
 
-      const videoUrl = URL.createObjectURL(file);
-
-      try {
-        const response = await fetch('/api/reels', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            videoUrl, 
-            caption, 
-            username: currentUser, 
-            userAvatar: currentAvatar 
-          })
-        });
-        
-        if(response.ok) {
-          closeModal();
-          alert('रील सफलतापूर्वक पब्लिश हो गई!');
-          document.getElementById('uploadForm').reset();
-          submitBtn.textContent = 'पब्लिश करें';
-          submitBtn.disabled = false;
-          loadReels();
-        } else {
-          alert('पब्लिश करने में एरर आया!');
-          su
+        const videoUrl = URL.createObjectUR
