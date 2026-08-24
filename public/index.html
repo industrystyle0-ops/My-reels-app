@@ -8,7 +8,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #000; color: #fff; font-family: sans-serif; overflow-x: hidden; padding-top: 0px; }
     
-    /* Top Header - Safely pushed down so it never overlaps battery/status bar */
+    /* Top Header */
     header { position: sticky; top: 0; width: 100%; z-index: 100; background: rgba(0,0,0,0.95); padding: 18px 16px 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
     .logo-container { display: flex; align-items: center; gap: 8px; }
     .logo-img { width: 30px; height: 30px; border-radius: 6px; object-fit: cover; border: 1px solid #444; }
@@ -27,7 +27,7 @@
     /* Modal / Popups */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; align-items: center; justify-content: center; }
     .modal-content { background: #111; padding: 20px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; border: 1px solid #333; }
-    .modal-content input { width: 100%; margin: 10px 0; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: white; font-size: 14px; }
+    .modal-content input, .modal-content select { width: 100%; margin: 10px 0; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: white; font-size: 14px; }
 
     /* Views / Pages */
     .app-view { display: none; width: 100vw; height: calc(100vh - 110px); overflow-y: auto; }
@@ -58,7 +58,6 @@
     /* Generic Page Styling */
     .page-content { padding: 20px; text-align: center; }
     .page-content h2 { margin-bottom: 15px; color: #fff; }
-    .search-input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; font-size: 14px; margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -66,7 +65,6 @@
   <!-- Top Header -->
   <header>
     <div class="logo-container">
-      <img src="logo.png" alt="UTGRAM" class="logo-img" onerror="this.style.display='none'">
       <div class="logo-text">UTGRAM</div>
     </div>
     <div class="top-actions">
@@ -93,7 +91,6 @@
   <div id="searchView" class="app-view">
     <div class="page-content">
       <h2>🔍 खोजें (Explore)</h2>
-      <input type="text" class="search-input" placeholder="यूज़र, वीडियो या टैग खोजें...">
       <div style="color: #666; font-size: 13px; margin-top: 40px;">लोकप्रिय ट्रेंडिंग रील्स जल्द यहाँ दिखेंगी।</div>
     </div>
   </div>
@@ -104,20 +101,16 @@
       <div style="width: 80px; height: 80px; background: #333; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 35px;">👤</div>
       <h2>@UTGRAM_Creator</h2>
       <p style="color:#aaa; font-size:13px; margin-bottom: 20px;">डिजिटल क्रिएटर | UTGRAM Official</p>
-      <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; font-size: 14px;">
-        <div><strong>0</strong><br><span style="color:#888; font-size:11px;">पोस्ट</span></div>
-        <div><strong>1.2K</strong><br><span style="color:#888; font-size:11px;">फॉलोअर्स</span></div>
-        <div><strong>180</strong><br><span style="color:#888; font-size:11px;">फॉलोइंग</span></div>
-      </div>
     </div>
   </div>
 
-  <!-- Upload Modal -->
+  <!-- Upload Modal (Gallery Video Upload) -->
   <div class="modal" id="uploadModal">
     <div class="modal-content">
-      <h3 style="margin-bottom:12px;">वीडियो लिंक से अपलोड करें</h3>
+      <h3 style="margin-bottom:12px;">गैलरी से वीडियो अपलोड करें</h3>
       <form id="uploadForm">
-        <input type="url" id="videoUrlInput" placeholder="वीडियो का डायरेक्ट लिंक (URL) यहाँ डालें..." required>
+        <label style="font-size: 12px; color: #aaa; display: block; text-align: left;">अपना वीडियो चुनें:</label>
+        <input type="file" id="videoFileInput" accept="video/*" required style="padding: 6px;">
         <input type="text" id="captionInput" placeholder="कैप्शन लिखें..." required>
         <button type="submit" style="background:#e50914; color:white; border:none; width:100%; margin-top:15px; padding:12px; border-radius:6px; font-weight:bold; cursor:pointer;">पब्लिश करें</button>
         <button type="button" onclick="closeModal()" style="background:none; color:#aaa; border:none; margin-top:12px; cursor:pointer; font-size:13px;">रद्द करें</button>
@@ -160,7 +153,7 @@
         const container = document.getElementById('reelsContainer');
 
         if(!reels || reels.length === 0) {
-          container.innerHTML = `<div style="padding-top:200px; text-align:center; color:#888; padding:20px;">कोई रील नहीं मिली।<br>नीचे ➕ अपलोड बटन से वीडियो लिंक डालकर जोड़ें!</div>`;
+          container.innerHTML = `<div style="padding-top:200px; text-align:center; color:#888; padding:20px;">कोई रील नहीं मिली।<br>नीचे ➕ अपलोड बटन से वीडियो जोड़ें!</div>`;
           return;
         }
 
@@ -263,11 +256,20 @@
 
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const videoUrl = document.getElementById('videoUrlInput').value;
+      const fileInput = document.getElementById('videoFileInput');
       const caption = document.getElementById('captionInput').value;
 
+      if(fileInput.files.length === 0) {
+        alert('कृपया वीडियो चुनें!');
+        return;
+      }
+
+      const file = fileInput.files[0];
       closeModal();
-      alert('वीडियो पब्लिश हो रहा है...');
+      alert('वीडियो प्रोसेस हो रहा है...');
+
+      // Convert local video file to object URL so it plays instantly on the device
+      const videoUrl = URL.createObjectURL(file);
 
       try {
         await fetch('/api/reels', {
