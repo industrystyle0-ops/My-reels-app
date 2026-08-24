@@ -6,44 +6,44 @@
   <title>UTGRAM</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+    body { background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; padding-bottom: 60px; }
     
     /* Top Header */
-    header { position: sticky; top: 0; width: 100%; z-index: 100; background: rgba(0,0,0,0.95); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+    header { position: sticky; top: 0; width: 100%; z-index: 999; background: #000; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
     .logo-text { font-size: 20px; font-weight: bold; letter-spacing: 1.5px; color: #fff; font-style: italic; }
     
     .nav-btn { background: #222; color: white; border: 1px solid #444; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
     .live-btn { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border: none; }
 
-    /* Bottom Navigation Bar */
-    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 55px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 100; }
-    .bottom-nav button { background: none; border: none; color: #888; font-size: 22px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+    /* Bottom Navigation Bar - FIXED z-index to stay on top */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 55px; background: #000; border-top: 1px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 99999; }
+    .bottom-nav button { background: none; border: none; color: #888; font-size: 22px; cursor: pointer; display: flex; flex-direction: column; align-items: center; padding: 5px 15px; }
     .bottom-nav button.active { color: #fff; }
     .bottom-nav button span { font-size: 9px; margin-top: 2px; }
 
     /* Modal / Popups */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999999; align-items: center; justify-content: center; }
     .modal-content { background: #121212; padding: 22px; border-radius: 16px; width: 90%; max-width: 360px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     .modal-content input, .modal-content textarea { width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #1e1e1e; color: white; font-size: 14px; }
     .modal-content p { font-size: 12px; color: #aaa; margin-bottom: 8px; text-align: left; }
 
     /* Views / Pages */
-    .app-view { display: none; width: 100vw; height: calc(100vh - 55px); overflow-y: auto; }
+    .app-view { display: none; width: 100vw; min-height: calc(100vh - 110px); }
     .app-view.active { display: block; }
 
     /* Reels Feed View */
-    #reelsView { padding-top: 0; overflow-y: scroll; scroll-snap-type: y mandatory; }
-    .reel-card { width: 100vw; height: calc(100vh - 55px); scroll-snap-align: start; position: relative; background: #000; display: flex; justify-content: center; align-items: center; }
+    #reelsView { padding-top: 0; }
+    .reel-card { width: 100vw; height: calc(100vh - 110px); position: relative; background: #000; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #222; }
     video { width: 100%; height: 100%; object-fit: cover; }
 
     /* Right Action Buttons */
-    .reel-actions { position: absolute; right: 12px; bottom: 75px; display: flex; flex-direction: column; gap: 16px; align-items: center; z-index: 10; }
+    .reel-actions { position: absolute; right: 12px; bottom: 20px; display: flex; flex-direction: column; gap: 16px; align-items: center; z-index: 10; }
     .action-btn { background: none; border: none; color: white; display: flex; flex-direction: column; align-items: center; font-size: 22px; cursor: pointer; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
     .action-btn span { font-size: 11px; margin-top: 4px; font-weight: 600; }
     .action-btn.liked { color: #ff3040; }
 
     /* Bottom Left Info & Follow */
-    .reel-details { position: absolute; left: 15px; bottom: 65px; z-index: 10; text-align: left; max-width: 75%; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+    .reel-details { position: absolute; left: 15px; bottom: 20px; z-index: 10; text-align: left; max-width: 75%; text-shadow: 0 2px 5px rgba(0,0,0,0.8); }
     .user-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .user-avatar-small { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #333; display: flex; align-items: center; justify-content: center; font-size: 14px; overflow: hidden; }
     .username { font-size: 15px; font-weight: bold; }
@@ -77,7 +77,7 @@
 
   <!-- 2. HOME VIEW -->
   <div id="homeView" class="app-view">
-    <div class="page-content" style="padding-bottom: 70px;">
+    <div class="page-content">
       <h2>🏠 UTGRAM होम फीड</h2>
       <div id="homeReelsContainer" style="margin-top: 15px; display: flex; flex-direction: column; gap: 15px;"></div>
     </div>
@@ -94,7 +94,7 @@
 
   <!-- 4. PROFILE VIEW -->
   <div id="profileView" class="app-view">
-    <div class="page-content" style="padding-bottom: 70px;">
+    <div class="page-content">
       <div id="profileAvatarContainer" style="width: 85px; height: 85px; background: #333; border-radius: 50%; margin: 0 auto 15px auto; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #e1306c; overflow: hidden; position: relative;">
         <span id="profileAvatarIcon">👤</span>
         <img id="profileAvatarImg" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
@@ -128,13 +128,13 @@
     </div>
   </div>
 
-  <!-- Bottom Navigation Bar -->
+  <!-- Bottom Navigation Bar - FIXED -->
   <nav class="bottom-nav">
-    <button onclick="switchTab('homeView', this)">🏠<span>होम</span></button>
-    <button onclick="switchTab('searchView', this)">🔍<span>सर्च</span></button>
-    <button onclick="openModal()" style="color:#0095f6;">➕<span>अपलोड</span></button>
+    <button onclick="switchTab('homeView', this)" id="homeNavBtn">🏠<span>होम</span></button>
+    <button onclick="switchTab('searchView', this)" id="searchNavBtn">🔍<span>सर्च</span></button>
+    <button onclick="openModal()" style="color:#0095f6;" id="uploadNavBtn">➕<span>अपलोड</span></button>
     <button onclick="switchTab('reelsView', this)" class="active" id="reelsNavBtn">🎬<span>रील्स</span></button>
-    <button onclick="switchTab('profileView', this)">👤<span>प्रोफाइल</span></button>
+    <button onclick="switchTab('profileView', this)" id="profileNavBtn">👤<span>प्रोफाइल</span></button>
   </nav>
 
   <script>
@@ -142,7 +142,6 @@
     let currentBio = localStorage.getItem('utgram_bio') || 'डिजिटल क्रिएटर | UTGRAM Official App 🚀';
     let currentAvatar = localStorage.getItem('utgram_avatar') || '';
 
-    // Load saved profile data on startup
     document.getElementById('editUsernameInput').value = currentUser;
     document.getElementById('editBioInput').value = currentBio;
     document.getElementById('profileNameDisplay').textContent = currentUser;
@@ -194,11 +193,11 @@
       document.getElementById(viewId).classList.add('active');
       
       document.querySelectorAll('.bottom-nav button').forEach(b => {
-        if(b.onclick && !b.onclick.toString().includes('openModal')) {
+        if(b.id !== 'uploadNavBtn') {
           b.classList.remove('active');
         }
       });
-      if(btn && !btn.onclick.toString().includes('openModal')) {
+      if(btn && btn.id !== 'uploadNavBtn') {
         btn.classList.add('active');
       }
 
@@ -231,7 +230,7 @@
         const container = document.getElementById('reelsContainer');
 
         if(!globalReels || globalReels.length === 0) {
-          container.innerHTML = `<div style="padding-top:200px; text-align:center; color:#888; padding:20px;">कोई रील नहीं मिली।<br>नीचे ➕ अपलोड बटन से वीडियो जोड़ें!</div>`;
+          container.innerHTML = `<div style="padding-top:150px; text-align:center; color:#888; padding:20px;">कोई रील नहीं मिली।<br>नीचे ➕ अपलोड बटन से वीडियो जोड़ें!</div>`;
           return;
         }
 
@@ -267,8 +266,6 @@
             </div>
           </div>
         `).join('');
-
-        setupVideoObserver();
       } catch (err) {
         console.log('Error loading reels');
       }
@@ -358,18 +355,6 @@
       }
     }
 
-    function setupVideoObserver() {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          const video = entry.target.querySelector('video');
-          if (entry.isIntersecting) { video.play().catch(e => {}); } 
-          else { video.pause(); }
-        });
-      }, { threshold: 0.6 });
-
-      document.querySelectorAll('.reel-card').forEach(card => observer.observe(card));
-    }
-
     function toggleFollow(btn) {
       if (btn.classList.contains('following')) {
         btn.classList.remove('following');
@@ -409,4 +394,21 @@
         const response = await fetch('/api/reels', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body
+          body: JSON.stringify({ 
+            videoUrl, 
+            caption, 
+            username: currentUser, 
+            userAvatar: currentAvatar 
+          })
+        });
+        
+        if(response.ok) {
+          closeModal();
+          alert('रील सफलतापूर्वक पब्लिश हो गई!');
+          document.getElementById('uploadForm').reset();
+          submitBtn.textContent = 'पब्लिश करें';
+          submitBtn.disabled = false;
+          loadReels();
+        } else {
+          alert('पब्लिश करने में एरर आया!');
+          su
